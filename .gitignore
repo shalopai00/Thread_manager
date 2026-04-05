@@ -1,0 +1,32 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Build artifacts
+cmake-build-debug/
+build/
+CMakeCache.txt
+CMakeFiles/
+*.o
+*.a
+*.so
+*.exe
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled files
+OpenMP_for_laba5
+*.ninja
+*.ninja_deps
+*.ninja_log
