@@ -90,7 +90,7 @@ void* worker(void* arg) {
     ThreadManager* tm = (ThreadManager*)arg;
     pthread_t my_id = pthread_self();
 
-    // Находим свой индекс в массиве
+
     int my_index = -1;
     for (int i = 0; i < worker_tasks_count; i++) {
         if (worker_tasks[i].target_thread == my_id) {
