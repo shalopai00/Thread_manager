@@ -77,10 +77,10 @@ TaskFunc pop_from_queue(queue* q) {
         return NULL;
     }
 
-    // Берём первую функцию
+
     TaskFunc func = q->functions[0];
 
-    // Сдвигаем элементы (только если есть что сдвигать)
+
     for (int i = 0; i < q->size - 1; i++) {
         q->functions[i] = q->functions[i + 1];
     }

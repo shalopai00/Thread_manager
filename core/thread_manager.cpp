@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "task.h"
 
-// Глобальная структура для передачи задачи воркеру
+
 typedef struct TaskForWorker {
     pthread_t target_thread;
     TaskFunc task;
@@ -13,19 +13,18 @@ typedef struct TaskForWorker {
     pthread_mutex_t mutex;
 } TaskForWorker;
 
-TaskForWorker* worker_tasks = NULL;  // массив задач для воркеров
-int worker_tasks_count = 0;
-ThreadManager* global_tm = NULL;     // для доступа в handle_request
+TaskForWorker* worker_tasks = NULL;
+ThreadManager* global_tm = NULL;
 
-// Функция, которую планировщик вызывает, чтобы дать задачу воркеру
+
 void give_task_to_worker(pthread_t thread_id) {
     printf("Scheduler: giving task to thread %lu\n", thread_id);
 
-    // Берём задачу из очереди q
+
     TaskFunc task = pop_from_queue(global_tm->q);
 
     if (task) {
-        // Находим задачу для этого воркера
+
         for (int i = 0; i < worker_tasks_count; i++) {
             if (worker_tasks[i].target_thread == thread_id) {
                 pthread_mutex_lock(&worker_tasks[i].mutex);
@@ -42,7 +41,7 @@ void give_task_to_worker(pthread_t thread_id) {
     }
 }
 
-// Обработчик запроса (передаёт задачу воркеру)
+
 void handle_request(pthread_t thread_id) {
     printf("Scheduler: processing request from thread %lu\n", thread_id);
     give_task_to_worker(thread_id);
@@ -59,7 +58,7 @@ void* scheduler(void* arg) {
     while (tm->is_running) {
         pthread_mutex_lock(&tm->mutex);
 
-        // Ждём, пока есть запросы в q1 И есть задачи в q
+
         while (tm->is_running && (!has_requests(tm->q1) || tm->q->size == 0)) {
             pthread_cond_wait(&tm->cond1, &tm->mutex);
         }
@@ -69,15 +68,15 @@ void* scheduler(void* arg) {
             break;
         }
 
-        // Берём запрос из q1 (вместе с thread_id)
+
         pthread_t thread_id;
         Request req = pop_request(tm->q1, &thread_id);
 
         pthread_mutex_unlock(&tm->mutex);
 
-        // Обрабатываем запрос - передаём задачу воркеру
+
         if (req) {
-            req(thread_id);  // вызовет handle_request -> give_task_to_worker
+            req(thread_id);
         }
     }
 
@@ -85,7 +84,7 @@ void* scheduler(void* arg) {
     return NULL;
 }
 
-// Воркер - запрашивает задачу и сам её выполняет
+
 void* worker(void* arg) {
     pthread_setname_np(pthread_self(), "worker");
     ThreadManager* tm = (ThreadManager*)arg;
@@ -103,7 +102,7 @@ void* worker(void* arg) {
     printf("Worker %lu: started\n", my_id);
 
     while (tm->is_running) {
-        // 1. Отправляем запрос менеджеру
+
         pthread_mutex_lock(&tm->mutex);
         push_request(tm->q1, handle_request, my_id);
         pthread_cond_signal(&tm->cond1);
@@ -111,7 +110,7 @@ void* worker(void* arg) {
 
         printf("Worker %lu: request sent, waiting for task...\n", my_id);
 
-        // 2. Ждём, пока менеджер даст задачу
+
         pthread_mutex_lock(&worker_tasks[my_index].mutex);
         while (tm->is_running && !worker_tasks[my_index].has_task) {
             pthread_cond_wait(&worker_tasks[my_index].cond, &worker_tasks[my_index].mutex);
@@ -122,12 +121,12 @@ void* worker(void* arg) {
             break;
         }
 
-        // 3. Получаем задачу
+
         TaskFunc task = worker_tasks[my_index].task;
         worker_tasks[my_index].has_task = 0;
         pthread_mutex_unlock(&worker_tasks[my_index].mutex);
 
-        // 4. Выподняем задачу
+
         if (task) {
             printf("Worker %lu: executing task\n", my_id);
             task();  // ← воркер сам выполняет task()
@@ -151,7 +150,7 @@ ThreadManager* create_thread_manager(int num_threads, int queue_capacity) {
     pthread_cond_init(&tm->cond, NULL);
     pthread_cond_init(&tm->cond1, NULL);
 
-    // Инициализируем массив задач для воркеров
+
     worker_tasks_count = num_threads;
     worker_tasks = (TaskForWorker*)malloc(sizeof(TaskForWorker) * num_threads);
     for (int i = 0; i < num_threads; i++) {
@@ -168,13 +167,13 @@ ThreadManager* create_thread_manager(int num_threads, int queue_capacity) {
 void start_manager(ThreadManager *tm) {
     tm->is_running = 1;
 
-    // Создаём потоки-воркеры и запоминаем их ID
+
     for (int i = 0; i < tm->thread_count; i++) {
         pthread_create(&tm->threads[i], NULL, worker, tm);
         worker_tasks[i].target_thread = tm->threads[i];
     }
 
-    // Создаём поток-планировщик
+
     pthread_t scheduler_thread;
     pthread_create(&scheduler_thread, NULL, scheduler, tm);
     pthread_detach(scheduler_thread);
@@ -186,20 +185,20 @@ void add_task(ThreadManager *tm, TaskFunc func) {
     pthread_mutex_lock(&tm->mutex);
     push_to_queue(tm->q, func);
     pthread_cond_signal(&tm->cond);
-    pthread_cond_signal(&tm->cond1);  // будим планировщик
+    pthread_cond_signal(&tm->cond1);
     pthread_mutex_unlock(&tm->mutex);
 }
 
 void stop_manager(ThreadManager *tm) {
     tm->is_running = 0;
 
-    // Будим всех воркеров
+
     pthread_mutex_lock(&tm->mutex);
     pthread_cond_broadcast(&tm->cond);
     pthread_cond_broadcast(&tm->cond1);
     pthread_mutex_unlock(&tm->mutex);
 
-    // Будим каждого воркера индивидуально
+
     for (int i = 0; i < worker_tasks_count; i++) {
         pthread_mutex_lock(&worker_tasks[i].mutex);
         worker_tasks[i].has_task = 1;  // чтобы вышли из ожидания
@@ -219,7 +218,7 @@ void destroy_manager(ThreadManager *tm) {
     destroy_request_queue(tm->q1);
     free(tm->threads);
 
-    // Очищаем массив задач воркеров
+
     for (int i = 0; i < worker_tasks_count; i++) {
         pthread_mutex_destroy(&worker_tasks[i].mutex);
         pthread_cond_destroy(&worker_tasks[i].cond);
