@@ -1,4 +1,4 @@
-# visualizer_simple.py
+
 import subprocess
 import time
 import tkinter as tk
