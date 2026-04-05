@@ -129,7 +129,7 @@ void* worker(void* arg) {
 
         if (task) {
             printf("Worker %lu: executing task\n", my_id);
-            task();  // ← воркер сам выполняет task()
+            task();
             printf("Worker %lu: task completed\n", my_id);
         }
     }
