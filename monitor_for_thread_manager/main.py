@@ -21,7 +21,7 @@ class ThreadMonitor:
         self.update_display()
 
     def create_widgets(self):
-        # Информационная панель
+
         info_frame = ttk.LabelFrame(self.root, text="Process Info", padding=10)
         info_frame.pack(fill=tk.X, padx=10, pady=5)
 
@@ -34,7 +34,7 @@ class ThreadMonitor:
         self.threads_label = ttk.Label(info_frame, text="Threads: 0", font=("Arial", 12))
         self.threads_label.pack(side=tk.LEFT, padx=10)
 
-        # Таблица потоков
+
         tree_frame = ttk.LabelFrame(self.root, text="Threads", padding=10)
         tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
@@ -57,7 +57,7 @@ class ThreadMonitor:
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        # Статистика
+
         stats_frame = ttk.LabelFrame(self.root, text="Statistics", padding=10)
         stats_frame.pack(fill=tk.X, padx=10, pady=5)
 

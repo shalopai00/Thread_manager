@@ -1,6 +1,3 @@
-//
-// Created by michael on 03.04.2026.
-//
 #include "Queue.h"
 #include <cstdio>
 #include <cstdlib>
@@ -32,20 +29,20 @@ queue* create_queue(int capacity) {
 }
 
 void push_to_queue(queue* q, TaskFunc func) {
-    // Защита от NULL
+
     if (!q) {
         printf("push_to_queue: queue is NULL\n");
         return;
     }
 
-    // Защита от переполнения
+
     if (q->size >= q->capacity) {
         printf("push_to_queue: queue is full (size=%d, capacity=%d)\n",
                q->size, q->capacity);
         return;
     }
 
-    // Защита от некорректной функции
+
     if (!func) {
         printf("push_to_queue: function is NULL\n");
         return;
@@ -58,19 +55,19 @@ void push_to_queue(queue* q, TaskFunc func) {
 }
 
 TaskFunc pop_from_queue(queue* q) {
-    // Защита от NULL
+
     if (!q) {
         printf("pop_from_queue: queue is NULL\n");
         return NULL;
     }
 
-    // Защита от пустой очереди
+
     if (q->size <= 0) {
         printf("pop_from_queue: queue is empty (size=%d)\n", q->size);
         return NULL;
     }
 
-    // Защита от выхода за границы
+
     if (q->size > q->capacity) {
         printf("pop_from_queue: FATAL - size %d > capacity %d\n",
                q->size, q->capacity);
