@@ -9,6 +9,6 @@ long long fib(int n) {
 }
 
 void task() {
-    long long result = fib(42);  // 45 уже очень тяжело, 50 - экстремально
+    long long result = fib(42);  
     printf("Thread %lu: fib(42)=%lld\n", pthread_self(), result);
 }
