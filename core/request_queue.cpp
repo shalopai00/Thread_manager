@@ -21,7 +21,7 @@ RequestQueue* create_request_queue(int capacity) {
         return NULL;
     }
 
-    // Добавляем массив для ID потоков
+    /
     q1->thread_ids = (pthread_t*)malloc(capacity * sizeof(pthread_t));
     if (!q1->thread_ids) {
         printf("create_request_queue: failed to allocate thread_ids array\n");
@@ -82,7 +82,7 @@ Request pop_request(RequestQueue* q1, pthread_t* thread_id) {
     Request req = q1->requests[0];
     *thread_id = q1->thread_ids[0];
 
-    // Сдвигаем элементы
+    
     for (int i = 0; i < q1->size_of_q1 - 1; i++) {
         q1->requests[i] = q1->requests[i + 1];
         q1->thread_ids[i] = q1->thread_ids[i + 1];
