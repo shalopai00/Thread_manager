@@ -47,11 +47,11 @@ void handle_request(pthread_t thread_id) {
     give_task_to_worker(thread_id);
 }
 
-// Планировщик - обрабатывает запросы из q1
+
 void* scheduler(void* arg) {
     pthread_setname_np(pthread_self(), "scheduler");
     ThreadManager* tm = (ThreadManager*)arg;
-    global_tm = tm;  // сохраняем для доступа в give_task_to_worker
+    global_tm = tm;  
 
     printf("Scheduler started\n");
 
